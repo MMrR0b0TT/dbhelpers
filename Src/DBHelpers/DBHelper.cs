@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //  Copyright 2010-2013 Natan Vivo - http://github.com/nvivo/dbhelpers
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -144,7 +144,7 @@ namespace DBHelpers
         public DbCommand CreateCommand(string commandText, params object[] parameters)
         {
             var len = parameters.Length;
-            
+
             var command = Factory.CreateCommand();
             command.CommandType = CommandType.Text;
 
@@ -156,7 +156,7 @@ namespace DBHelpers
                 {
                     var parameter = parameters[i];
                     var rawValue = parameter as RawValue;
-                    
+
                     if (rawValue != null)
                     {
                         formatValues[i] = rawValue.Value;
@@ -298,6 +298,12 @@ namespace DBHelpers
 
         public DataTable ExecuteDataTable(DbCommand command, int startRecord, int maxRecords, DbConnection connection)
         {
+            if (startRecord < 0)
+                throw new ArgumentOutOfRangeException("startRecord", "StartRecord must be zero or higher.");
+
+            if (maxRecords < 0)
+                throw new ArgumentOutOfRangeException("maxRecords", "MaxRecords must be zero or higher.");
+
             command.Connection = connection;
 
             DbDataAdapter adapter = Factory.CreateDataAdapter();
@@ -333,12 +339,12 @@ namespace DBHelpers
 
         public DataTable ExecuteDataTable(DbCommand command, DbConnection connection)
         {
-            return ExecuteDataTable(command, 0, -1, connection);
+            return ExecuteDataTable(command, 0, 0, connection);
         }
-        
+
         public DataTable ExecuteDataTable(DbCommand command)
         {
-            return ExecuteDataTable(command, 0, -1);
+            return ExecuteDataTable(command, 0, 0);
         }
 
         #endregion
@@ -444,7 +450,7 @@ namespace DBHelpers
         {
             return ExecuteArray<T>(command, GetTypeConverter<T>());
         }
-        
+
         #endregion
 
         #region ExecuteDictionary<TKey, TValue>
@@ -535,7 +541,7 @@ namespace DBHelpers
 
             return o;
         }
-        
+
         public T ExecuteObject<T>(DbCommand command, Converter<DbDataReader, T> converter)
         {
             T o;
@@ -553,7 +559,7 @@ namespace DBHelpers
         }
 
         public T ExecuteObject<T>(DbCommand command, DbConnection connection)
-            where T: new()
+            where T : new()
         {
             var converter = GetDataReaderConverter<T>();
             return ExecuteObject<T>(command, converter, connection);
@@ -607,7 +613,7 @@ namespace DBHelpers
         {
             return ExecuteList<T>(command, converter, 0, -1, connection);
         }
-        
+
         public List<T> ExecuteList<T>(DbCommand command, Converter<DbDataReader, T> converter)
         {
             return ExecuteList<T>(command, converter, 0, -1);
@@ -628,7 +634,7 @@ namespace DBHelpers
         }
 
         public List<T> ExecuteList<T>(DbCommand command, DbConnection connection)
-            where T:new()
+            where T : new()
         {
             var converter = GetDataReaderConverter<T>();
             return ExecuteList<T>(command, converter, connection);
