@@ -32,19 +32,21 @@ namespace DBHelpers.Tests
         {
             var db = NewSqlHelper();
 
-            var commandText = "text {0}, {1}, {2}, {3}";
+            var commandText = "text {0}, {1}, {2}, {3}, {4}";
             var p0 = 1;
             var p1 = "foo";
             var p2 = DateTime.Now;
             var p3 = new RawValue("(raw text)");
-            var command = db.CreateCommand(commandText, p0, p1, p2, p3);
+            object p4 = null;
+            var command = db.CreateCommand(commandText, p0, p1, p2, p3, p4);
 
-            Assert.AreEqual("text @p0, @p1, @p2, (raw text)", command.CommandText);
+            Assert.AreEqual("text @p0, @p1, @p2, (raw text), @p4", command.CommandText);
             Assert.AreEqual(CommandType.Text, command.CommandType);
-            Assert.AreEqual(3, command.Parameters.Count);
+            Assert.AreEqual(4, command.Parameters.Count);
             Assert.AreEqual(p0, command.Parameters[0].Value);
             Assert.AreEqual(p1, command.Parameters[1].Value);
             Assert.AreEqual(p2, command.Parameters[2].Value);
+            Assert.AreEqual(DBNull.Value, command.Parameters[3].Value);
         }
 
         [Test]
