@@ -144,6 +144,9 @@ namespace DBHelpers
                 for (var i = 0; i < len; i++)
                 {
                     var parameter = parameters[i];
+                    if (parameter == null)
+                        parameter = DBNull.Value;
+                        
                     var rawValue = parameter as RawValue;
 
                     if (rawValue != null)
